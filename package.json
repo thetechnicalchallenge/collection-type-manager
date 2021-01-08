@@ -1,0 +1,25 @@
+{
+  "name": "collection-type-manager",
+  "version": "0.0.1",
+  "description": "Javascript library to easily interact with Symfony CollectionType Field https://symfony.com/doc/current/reference/forms/types/collection.html#adding-and-removing-items",
+  "main": "src/CollectionTypeManager.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thetechnicalchallenge/collection-type-manager.git"
+  },
+  "keywords": [
+    "symfony",
+    "form",
+    "collection-type",
+    "CollectionType"
+  ],
+  "author": "thetechnicalchallenge@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/thetechnicalchallenge/collection-type-manager/issues"
+  },
+  "homepage": "https://github.com/thetechnicalchallenge/collection-type-manager#readme"
+}
