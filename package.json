@@ -21,5 +21,9 @@
   "bugs": {
     "url": "https://github.com/thetechnicalchallenge/collection-type-manager/issues"
   },
-  "homepage": "https://github.com/thetechnicalchallenge/collection-type-manager#readme"
+  "homepage": "https://github.com/thetechnicalchallenge/collection-type-manager#readme",
+  "dependencies": {
+    "babel": "^6.23.0",
+    "core-js": "^3.8.2"
+  }
 }
