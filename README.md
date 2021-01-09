@@ -48,7 +48,7 @@ The easiest way to create your design is to create a [form theme](https://symfon
 
 Here is a very basic example that you can customize:
 *As you can see, the name of your field must begin with an underscore "_" and be converted to [snake case](https://en.wikipedia.org/wiki/Snake_case) format*.
-```twig-template
+```twig
 {% block _example_collection_widget %}  
 {# the container of widgets #}
 <ul id="collection-fields-list"  
