@@ -6,6 +6,7 @@ Javascript library to easily interact with [Symfony CollectionType Field](https:
 ```bash
 npm i collection-type-manager
 ```
+
 ```js
 import CollectionTypeManager from "collection-type-manager";
 ```
@@ -26,20 +27,21 @@ $builder
 Here is what the minimum configuration looks like:
 ```js
 const ExampleCollection = new CollectionTypeManager({  
-    containerId: 'collection-fields-list', // the container id of your collection
-    addButtonId: 'add-collection-widget', // the button id for adding a widget
-    removeButtonsClassName: 'remove-collection-widget', // the class of all the remove buttons
+  containerId: 'collection-fields-list', // the container id of your collection
+  addButtonId: 'add-collection-widget', // the button id for adding a widget
+  removeButtonsClassName: 'remove-collection-widget', // the class of all the remove buttons
 });
 ```
+
 You can also configure callbacks for three events:
 ```js
 let eventConfig = {
-    isBuilt: () => yourAfterBuiltFunction,  
-    afterAddElement: () => {  
-        // Here you can access to the new widget just added
-        ExampleCollection.getLastWidgetAdded();
-    },  
-    afterRemoveElement: () => yourAfterRemoveFunction
+  isBuilt: () => yourAfterBuiltFunction,  
+  afterAddElement: () => {  
+    // Here you can access to the new widget just added
+    ExampleCollection.getLastWidgetAdded();
+  },  
+  afterRemoveElement: () => yourAfterRemoveFunction
 }
 ```
 
@@ -51,27 +53,25 @@ Here is a very basic example that you can customize:
 ```twig
 {% block _example_collection_widget %}  
 {# the container of widgets #}
-<ul id="collection-fields-list"  
-      data-prototype="{{ form_widget(form.vars.prototype)|e }}"  
-      data-counter="{{ form|length }}">  
-     {% for collection in form %}  
-            {{ form_widget(collection) }}  
-     {% endfor %}  
+<ul 
+  id="collection-fields-list"  
+  data-prototype="{{ form_widget(form.vars.prototype)|e }}"  
+  data-counter="{{ form|length }}">  
+    {% for collection in form %}  
+      {{ form_widget(collection) }}  
+    {% endfor %}  
 </ul>  
   
- {# data-target indicates the container id where add the new widget #}
- <button data-target="#collection-fields-list" id="add-collection-widget" type="button">Add</button>  
+{# data-target indicates the container id where add the new widget #}
+<button data-target="#collection-fields-list" id="add-collection-widget" type="button">Add</button>  
 {% endblock %}  
   
 {% block _example_collection_entry_widget %}  
 {# A widget in the loop #}
  <div id="{{id}}">  
   {{form_row(form.answer)}} 
- {# 
-    data-target indicates the widget id to remove
-    don't forget the class for the remove button
-  #}
-  <button type="button" data-target="{{id}}" class="remove-collection-widget"> Remove</button>  
+  {# data-target indicates the widget id to remove, don't forget the class for the remove button #}
+  <button type="button" data-target="{{id}}" class="remove-collection-widget"> Remove </button>  
  </div>
 {% endblock %}
 ```
