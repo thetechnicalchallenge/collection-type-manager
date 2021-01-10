@@ -1,6 +1,8 @@
 /**
  * @author thetechnicalchallenge@gmail.com
  */
+import Sortable from "sortablejs";
+
 export default class CollectionTypeManager {
     constructor(settings = {
         containerId: null,
@@ -8,7 +10,9 @@ export default class CollectionTypeManager {
         removeButtonsClassName: null,
         isBuilt: null,
         afterAddElement: null,
-        afterRemoveElement: null
+        afterRemoveElement: null,
+        enableSortable: false,
+        sortableConfig: {}
     }) {
         this.settings = settings;
         this.container = document.getElementById(settings.containerId);
@@ -22,9 +26,66 @@ export default class CollectionTypeManager {
 
         this.listenButtons();
 
+        if (settings.enableSortable) {
+            let config = this.sortOnEnd(settings.sortableConfig);
+            this.sortable = Sortable.create(this.container, config)
+        }
+
+        this.fields = [];
+        this.sortFieldNames();
+
         if (settings.isBuilt instanceof Function) {
             settings.isBuilt();
         }
+    }
+
+    sortOnEnd(sortableConfig)
+    {
+        let config = {};
+        if (sortableConfig && sortableConfig.hasOwnProperty('onEnd')) {
+            config.onEnd = () => {
+                this.sortFieldNames();
+                sortableConfig.onEnd();
+            }
+        } else {
+            config.onEnd = (evt) => {
+                this.sortFieldNames();
+            }
+        }
+
+        return config;
+    }
+
+    getFields()
+    {
+        return this.fields;
+    }
+
+    sortFieldNames()
+    {
+        this.fields = [];
+        let collectionItems = Array.from(this.container.children);
+        collectionItems.forEach((item, indexA) => {
+            let fields = Array.from(item.querySelectorAll("select, textarea, input"));
+            fields.forEach(child => {
+                child.name = child.name.replace(/\[(\d+)\]/g, `[${indexA}]`);
+                this.fields.push(child);
+            });
+        });
+    }
+
+    getContainer()
+    {
+        return this.container;
+    }
+
+    getSortable()
+    {
+        if (!this.settings.enableSortable) {
+            console.log(new Error('You must set "enableSortable" to true for using this feature.'));
+        }
+
+        return this.sortable;
     }
 
     listenButtons()
@@ -48,6 +109,8 @@ export default class CollectionTypeManager {
 
         this.container.appendChild(widgetContainer.children[0]);
         this.counter++;
+
+        this.sortFieldNames();
 
         if (this.settings.afterAddElement instanceof Function) {
             this.settings.afterAddElement();

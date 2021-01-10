@@ -6,24 +6,60 @@ Javascript library to easily interact with [Symfony CollectionType Field](https:
 ```bash
 npm i collection-type-manager
 ```
-
 ```js
 import CollectionTypeManager from "collection-type-manager";
 ```
+## Usage
+In this documentation, we will use the example of an `exampleCollection` field containing an `ExampleCollection` class for all chapters.
 
-## In your Symfony FormType
+### In your Symfony FormType
 First, set `allow_add` and `allow_delete` to true.
 ```php
 $builder  
   ->add('exampleCollection', CollectionType::class, [  
-  'entry_type' => ExampleCollection::class,  
-  'allow_add' => true,  
-  'allow_delete' => true,  
+    'entry_type' => ExampleCollection::class,  
+    'allow_add' => true,  
+    'allow_delete' => true,  
   ])  
 ;
 ```
+### Twig Form Theme
+The easiest way to create your design is to create a [form theme](https://symfony.com/doc/current/form/form_themes.html). For this example, I propose you to implement a theme in [the same template as your form](https://symfony.com/doc/current/form/form_themes.html#creating-a-form-theme-in-the-same-template-as-the-form). 
+Take the time to consult the cited links in order to understand the rest of the documentation and adapt according to your preferences or needs.
 
-## JavaScript
+Here is a very basic example that you can customize:
+*As you can see, the name of your field must begin with an underscore "_" and be converted to [snake case](https://en.wikipedia.org/wiki/Snake_case) format*.
+
+```twig
+{% block _example_collection_widget %}  
+<ul id="collection-fields-list" {# the container id of your collection items #}
+      data-prototype="{{ form_widget(form.vars.prototype)|e }}"
+      data-counter="{{ form|length }}">  
+     {% for collection in form %}  
+         {{ form_widget(collection) }}  
+     {% endfor %}  
+</ul>  
+  
+ <button 
+     data-target="#collection-fields-list" {# the container id where add the new widget #}
+     id="add-collection-widget" {# the button used for add widget #}
+     type="button">Add</button>  
+{% endblock %}  
+  
+{% block _example_collection_entry_widget %}  
+ <li id="{{id}}">  
+  {{form_row(form.answer)}} 
+  <button type="button" 
+      data-target="{{id}}" {# indicates the widget id to remove #}
+      class="remove-collection-widget"> {# class for all the existing remove buttons #}
+      Remove
+  </button>  
+ </li>
+{% endblock %}
+```
+Pay attention to the HTML tags of the container's children in case you use the Sortable implementation. An `ul` container cannot have `div` children. Use a `div` container if you want `div` children.
+
+### Basic configuration
 Here is what the minimum configuration looks like:
 ```js
 const ExampleCollection = new CollectionTypeManager({  
@@ -32,7 +68,6 @@ const ExampleCollection = new CollectionTypeManager({
   removeButtonsClassName: 'remove-collection-widget', // the class of all the remove buttons
 });
 ```
-
 You can also configure callbacks for three events:
 ```js
 let eventConfig = {
@@ -44,35 +79,24 @@ let eventConfig = {
   afterRemoveElement: () => yourAfterRemoveFunction
 }
 ```
+### The Sortable Implementation
+*This implementation is not fully tested and will not be as long as this library is in bêta.*
+The collection type manager component implement the library Sortable:
+Some examples of UX possibilities: https://sortablejs.github.io/Sortable
 
-## Form theme
-The easiest way to create your design is to create a [form theme](https://symfony.com/doc/current/form/form_themes.html). For this example, I propose you to implement a theme in [the same template as your form](https://symfony.com/doc/current/form/form_themes.html#creating-a-form-theme-in-the-same-template-as-the-form). 
+To enable Sortable, you must set the `enableSortable` option to `true`. 
+You can change the default configuration and connect to Sortable events using the `sortableConfig` property.
 
-Here is a very basic example that you can customize:
-*As you can see, the name of your field must begin with an underscore "_" and be converted to [snake case](https://en.wikipedia.org/wiki/Snake_case) format*.
-```twig
-{% block _example_collection_widget %}  
-{# the container of widgets #}
-<ul 
-  id="collection-fields-list"  
-  data-prototype="{{ form_widget(form.vars.prototype)|e }}"  
-  data-counter="{{ form|length }}">  
-    {% for collection in form %}  
-      {{ form_widget(collection) }}  
-    {% endfor %}  
-</ul>  
-  
-{# data-target indicates the container id where add the new widget #}
-<button data-target="#collection-fields-list" id="add-collection-widget" type="button">Add</button>  
-{% endblock %}  
-  
-{% block _example_collection_entry_widget %}  
-{# A widget in the loop #}
- <div id="{{id}}">  
-  {{form_row(form.answer)}} 
-  {# data-target indicates the widget id to remove, don't forget the class for the remove button #}
-  <button type="button" data-target="{{id}}" class="remove-collection-widget"> Remove </button>  
- </div>
-{% endblock %}
+Example:
+```js
+let sortableConfig = enableSortable: true,  
+  sortableConfig: {  
+    onEnd: function (/**Event*/evt) {  
+        // Your logic
+    },  
+},
 ```
+When using Sortable, the names of your form fields are automatically updated to respect the order you have chosen. So you don't have to worry about your request to process your form data.
+Github Options: https://github.com/SortableJS/Sortable#options
+
 *PR and constructive criticism are welcome :)*

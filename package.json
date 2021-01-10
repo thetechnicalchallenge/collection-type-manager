@@ -1,6 +1,6 @@
 {
   "name": "collection-type-manager",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Javascript library to easily interact with Symfony CollectionType Field https://symfony.com/doc/current/reference/forms/types/collection.html#adding-and-removing-items",
   "main": "src/CollectionTypeManager.js",
   "scripts": {
@@ -24,6 +24,7 @@
   "homepage": "https://github.com/thetechnicalchallenge/collection-type-manager#readme",
   "dependencies": {
     "babel": "^6.23.0",
-    "core-js": "^3.8.2"
+    "core-js": "^3.8.2",
+    "sortablejs": "^1.13.0"
   }
 }
