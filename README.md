@@ -78,8 +78,8 @@ let eventConfig = {
   afterRemoveElement: () => yourAfterRemoveFunction
 }
 ```
-### The Sortable Implementation
-*This implementation is not fully tested and will not be as long as this library is in bêta.*
+### The Sortable Implementation (work in progress)
+*Only the simple list feature is tested for now.*
 The collection type manager component implement the library Sortable:
 Some examples of UX possibilities: https://sortablejs.github.io/Sortable
 
