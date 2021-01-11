@@ -32,30 +32,21 @@ Here is a very basic example that you can customize:
 
 ```twig
 {% block _quiz_questions_widget %}  
-<ul id="question-fields-list" {# the container id of your collection items #}
-      data-prototype="{{ form_widget(form.vars.prototype)|e }}"
-      data-counter="{{ form|length }}">  
-     {% for question in form %}  
-         {{ form_widget(question) }}  
-     {% endfor %}  
+<ul id="question-fields-list" data-prototype="{{ form_widget(form.vars.prototype)|e }}" data-counter="{{ form|length }}">  
+  {% for question in form %}  
+      {{ form_widget(question) }}  
+  {% endfor %}  
 </ul>  
   
- <button 
-     data-target="#question-fields-list" {# the container id where add the new widget #}
-     id="add-question-widget" {# the button used for add widget #}
-     type="button">Add</button>  
+<button data-target="#question-fields-list" id="add-question-widget" type="button">Add</button>  
 {% endblock %}  
   
 {% block _quiz_questions_entry_widget %}  
- <li id="{{id}}">  
+<li id="{{id}}">  
   {{form_row(form.question)}} 
   {{form_row(form.answer)}} 
-  <button type="button" 
-      data-target="{{id}}" {# indicates the widget id to remove #}
-      class="remove-question-widget"> {# class for all the existing remove buttons #}
-      Remove
-  </button>  
- </li>
+  <button type="button" data-target="{{id}}" class="remove-question-widget"> Remove </button>  
+</li>
 {% endblock %}
 ```
 Pay attention to the HTML tags of the container's children in case you use the Sortable implementation. 
