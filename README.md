@@ -32,20 +32,26 @@ Here is a very basic example that you can customize:
 
 ```twig
 {% block _quiz_questions_widget %}  
-<ul id="question-fields-list" data-prototype="{{ form_widget(form.vars.prototype)|e }}" data-counter="{{ form|length }}">  
+<ul id="question-fields-list" 
+  data-prototype="{{ form_widget(form.vars.prototype)|e }}" 
+  data-counter="{{ form|length }}">  
   {% for question in form %}  
       {{ form_widget(question) }}  
   {% endfor %}  
 </ul>  
   
-<button data-target="#question-fields-list" id="add-question-widget" type="button">Add</button>  
+<button type="button" 
+  data-target="#question-fields-list" 
+  id="add-question-widget">Add</button>  
 {% endblock %}  
   
 {% block _quiz_questions_entry_widget %}  
 <li id="{{id}}">  
   {{form_row(form.question)}} 
   {{form_row(form.answer)}} 
-  <button type="button" data-target="{{id}}" class="remove-question-widget"> Remove </button>  
+  <button type="button" 
+    data-target="{{id}}" 
+    class="remove-question-widget"> Remove </button>  
 </li>
 {% endblock %}
 ```
