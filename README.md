@@ -80,6 +80,7 @@ let eventConfig = {
 ```
 ### The Sortable Implementation (work in progress)
 *Only the simple list feature is tested for now.*
+
 The collection type manager component implement the library Sortable:
 Some examples of UX possibilities: https://sortablejs.github.io/Sortable
 
@@ -93,7 +94,7 @@ let sortableConfig = {
   onEnd: function (/**Event*/evt) {  
       // Your logic
   },  
-},
+}
 ```
 When using Sortable, the names of your form fields are automatically updated to respect the order you have chosen. So you don't have to worry about your request to process your form data.
 Github Options: https://github.com/SortableJS/Sortable#options
