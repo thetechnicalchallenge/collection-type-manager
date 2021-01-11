@@ -88,11 +88,11 @@ You can change the default configuration and connect to Sortable events using th
 
 Example:
 ```js
-let sortableConfig = enableSortable: true,  
-  sortableConfig: {  
-    onEnd: function (/**Event*/evt) {  
-        // Your logic
-    },  
+  
+let sortableConfig = {  
+  onEnd: function (/**Event*/evt) {  
+      // Your logic
+  },  
 },
 ```
 When using Sortable, the names of your form fields are automatically updated to respect the order you have chosen. So you don't have to worry about your request to process your form data.
