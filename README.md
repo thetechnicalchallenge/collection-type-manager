@@ -17,7 +17,7 @@ First, set `allow_add` and `allow_delete` to true.
 ```php
 $builder  
   ->add('exampleCollection', CollectionType::class, [  
-    'entry_type' => ExampleCollection::class,  
+    'entry_type' => ExampleCollectionType::class,  
     'allow_add' => true,  
     'allow_delete' => true,  
   ])  
