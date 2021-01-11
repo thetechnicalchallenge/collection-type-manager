@@ -10,14 +10,14 @@ npm i collection-type-manager
 import CollectionTypeManager from "collection-type-manager";
 ```
 ## Usage
-In this documentation, we will use the example of an `exampleCollection` field containing an `ExampleCollection` class for all chapters.
+In this documentation, we will use the example of a `QuizType` form with a `questions` field as a collection.
 
 ### In your Symfony FormType
 First, set `allow_add` and `allow_delete` to true.
 ```php
 $builder  
-  ->add('exampleCollection', CollectionType::class, [  
-    'entry_type' => ExampleCollectionType::class,  
+  ->add('questions', CollectionType::class, [  
+    'entry_type' => QuestionType::class,  
     'allow_add' => true,  
     'allow_delete' => true,  
   ])  
@@ -31,41 +31,43 @@ Here is a very basic example that you can customize:
 *As you can see, the name of your field must begin with an underscore "_" and be converted to [snake case](https://en.wikipedia.org/wiki/Snake_case) format*.
 
 ```twig
-{% block _example_collection_widget %}  
-<ul id="collection-fields-list" {# the container id of your collection items #}
+{% block _quiz_questions_widget %}  
+<ul id="question-fields-list" {# the container id of your collection items #}
       data-prototype="{{ form_widget(form.vars.prototype)|e }}"
       data-counter="{{ form|length }}">  
-     {% for collection in form %}  
-         {{ form_widget(collection) }}  
+     {% for question in form %}  
+         {{ form_widget(question) }}  
      {% endfor %}  
 </ul>  
   
  <button 
-     data-target="#collection-fields-list" {# the container id where add the new widget #}
-     id="add-collection-widget" {# the button used for add widget #}
+     data-target="#question-fields-list" {# the container id where add the new widget #}
+     id="add-question-widget" {# the button used for add widget #}
      type="button">Add</button>  
 {% endblock %}  
   
-{% block _example_collection_entry_widget %}  
+{% block _quiz_questions_entry_widget %}  
  <li id="{{id}}">  
+  {{form_row(form.question)}} 
   {{form_row(form.answer)}} 
   <button type="button" 
       data-target="{{id}}" {# indicates the widget id to remove #}
-      class="remove-collection-widget"> {# class for all the existing remove buttons #}
+      class="remove-question-widget"> {# class for all the existing remove buttons #}
       Remove
   </button>  
  </li>
 {% endblock %}
 ```
-Pay attention to the HTML tags of the container's children in case you use the Sortable implementation. An `ul` container cannot have `div` children. Use a `div` container if you want `div` children.
+Pay attention to the HTML tags of the container's children in case you use the Sortable implementation. 
+An `ul` container cannot have `div` children. Use a `div` container if you want `div` children.
 
 ### Basic configuration
 Here is what the minimum configuration looks like:
 ```js
-const ExampleCollection = new CollectionTypeManager({  
-  containerId: 'collection-fields-list', // the container id of your collection
-  addButtonId: 'add-collection-widget', // the button id for adding a widget
-  removeButtonsClassName: 'remove-collection-widget', // the class of all the remove buttons
+const QuizManager = new CollectionTypeManager({  
+  containerId: 'question-fields-list', // the container id of your collection
+  addButtonId: 'add-question-widget', // the button id for adding a widget
+  removeButtonsClassName: 'remove-question-widget', // the class of all the remove buttons
 });
 ```
 You can also configure callbacks for three events:
@@ -74,7 +76,7 @@ let eventConfig = {
   isBuilt: () => yourAfterBuiltFunction,  
   afterAddElement: () => {  
     // Here you can access to the new widget just added
-    ExampleCollection.getLastWidgetAdded();
+    QuizManager.getLastWidgetAdded();
   },  
   afterRemoveElement: () => yourAfterRemoveFunction
 }
