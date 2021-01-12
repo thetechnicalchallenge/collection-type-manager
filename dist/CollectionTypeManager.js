@@ -7,6 +7,12 @@ exports.default = void 0;
 
 var _sortablejs = _interopRequireDefault(require("sortablejs"));
 
+var _EventDispatcher = _interopRequireDefault(require("./EventDispatcher"));
+
+var _Subscriber = _interopRequireDefault(require("./Subscriber"));
+
+var _SortableEventAdapter = _interopRequireDefault(require("./SortableEventAdapter"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -18,12 +24,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 var CollectionTypeManager = /*#__PURE__*/function () {
   function CollectionTypeManager() {
     var settings = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
-      containerId: null,
-      addButtonId: null,
-      removeButtonsClassName: null,
-      isBuilt: null,
-      afterAddElement: null,
-      afterRemoveElement: null,
+      containerId: '',
+      addButtonId: '',
+      removeButtonsClassName: '',
+      subscriber: _Subscriber.default,
       enableSortable: false,
       sortableConfig: {}
     };
@@ -31,47 +35,71 @@ var CollectionTypeManager = /*#__PURE__*/function () {
     _classCallCheck(this, CollectionTypeManager);
 
     this.settings = settings;
+    this.eventDispatcher = new _EventDispatcher.default();
+    this.eventDispatcher.addSubscriber(this.configureInternalSubscriber());
+
+    if (settings.subscriber instanceof Function) {
+      this.eventDispatcher.addSubscriber(settings.subscriber());
+    }
+
     this.container = document.getElementById(settings.containerId);
-    this.addButton = document.getElementById(settings.addButtonId);
-    this.removeButtons = Array.from(document.getElementsByClassName(settings.removeButtonsClassName));
     this.widgetPrototype = this.container.dataset.prototype;
     this.counter = this.container.dataset.counter;
+    this.fields = [];
     this.lastWidgetAdded = null;
-    this.listenButtons();
+    this.bindListeners(document.getElementById(settings.addButtonId), Array.from(document.getElementsByClassName(settings.removeButtonsClassName)));
 
     if (settings.enableSortable) {
-      var config = this.sortOnEnd(settings.sortableConfig);
+      var config = new _SortableEventAdapter.default().adapt(this, settings.sortableConfig);
       this.sortable = _sortablejs.default.create(this.container, config);
     }
 
-    this.fields = [];
-    this.sortFieldNames();
-
-    if (settings.isBuilt instanceof Function) {
-      settings.isBuilt();
-    }
+    this.eventDispatcher.dispatch('mount');
   }
 
   _createClass(CollectionTypeManager, [{
-    key: "sortOnEnd",
-    value: function sortOnEnd(sortableConfig) {
+    key: "configureInternalSubscriber",
+    value: function configureInternalSubscriber() {
+      var internalSubscriber = new _Subscriber.default();
+      internalSubscriber.subscribe(['mount', 'after.add.widget', 'after.remove.widget'], this.sortFieldNames.bind(this));
+      return internalSubscriber;
+    }
+  }, {
+    key: "bindListeners",
+    value: function bindListeners(addButton, removeButtons) {
       var _this = this;
 
-      var config = {};
-
-      if (sortableConfig && sortableConfig.hasOwnProperty('onEnd')) {
-        config.onEnd = function () {
-          _this.sortFieldNames();
-
-          sortableConfig.onEnd();
-        };
-      } else {
-        config.onEnd = function (evt) {
-          _this.sortFieldNames();
-        };
-      }
-
-      return config;
+      addButton.addEventListener('click', this.addElement.bind(this));
+      removeButtons.forEach(function (removeButton) {
+        removeButton.addEventListener('click', _this.removeElement.bind(_this, removeButton));
+      });
+    }
+  }, {
+    key: "addElement",
+    value: function addElement() {
+      this.eventDispatcher.dispatch('before.add.widget');
+      var widgetContainer = document.createElement('div');
+      widgetContainer.innerHTML = this.widgetPrototype.replace(/__name__/g, this.counter);
+      var removeButton = widgetContainer.children[0].getElementsByClassName(this.settings.removeButtonsClassName)[0];
+      removeButton.addEventListener('click', this.removeElement.bind(this, removeButton));
+      this.lastWidgetAdded = widgetContainer.children[0];
+      this.container.appendChild(widgetContainer.children[0]);
+      this.counter++;
+      this.eventDispatcher.dispatch('after.add.widget');
+    }
+  }, {
+    key: "removeElement",
+    value: function removeElement(removeButton) {
+      this.eventDispatcher.dispatch('before.remove.widget');
+      var targetElement = document.getElementById(removeButton.dataset.target);
+      removeButton.removeEventListener('click', this.removeElement.bind(this, removeButton));
+      this.container.removeChild(targetElement);
+      this.eventDispatcher.dispatch('after.remove.widget');
+    }
+  }, {
+    key: "getLastWidgetAdded",
+    value: function getLastWidgetAdded() {
+      return this.lastWidgetAdded;
     }
   }, {
     key: "getFields",
@@ -107,48 +135,6 @@ var CollectionTypeManager = /*#__PURE__*/function () {
       }
 
       return this.sortable;
-    }
-  }, {
-    key: "listenButtons",
-    value: function listenButtons() {
-      var _this3 = this;
-
-      this.addButton.addEventListener('click', this.addElement.bind(this));
-      this.removeButtons.forEach(function (removeButton, index) {
-        removeButton.addEventListener('click', _this3.removeElement.bind(_this3, removeButton));
-      });
-    }
-  }, {
-    key: "addElement",
-    value: function addElement() {
-      var widgetContainer = document.createElement('div');
-      widgetContainer.innerHTML = this.widgetPrototype.replace(/__name__/g, this.counter);
-      var removeButton = widgetContainer.children[0].getElementsByClassName(this.settings.removeButtonsClassName)[0];
-      removeButton.addEventListener('click', this.removeElement.bind(this, removeButton));
-      this.lastWidgetAdded = widgetContainer.children[0];
-      this.container.appendChild(widgetContainer.children[0]);
-      this.counter++;
-      this.sortFieldNames();
-
-      if (this.settings.afterAddElement instanceof Function) {
-        this.settings.afterAddElement();
-      }
-    }
-  }, {
-    key: "getLastWidgetAdded",
-    value: function getLastWidgetAdded() {
-      return this.lastWidgetAdded;
-    }
-  }, {
-    key: "removeElement",
-    value: function removeElement(removeButton) {
-      var targetElement = document.getElementById(removeButton.dataset.target);
-      removeButton.removeEventListener('click', this.removeElement.bind(this, removeButton));
-      this.container.removeChild(targetElement);
-
-      if (this.settings.afterRemoveElement instanceof Function) {
-        this.settings.afterRemoveElement();
-      }
     }
   }]);
 

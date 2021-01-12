@@ -1,4 +1,4 @@
-# collection-type-manager (Bêta version)
+# collection-type-manager
 
 Javascript library to easily interact with [Symfony CollectionType Field](https://symfony.com/doc/current/reference/forms/types/collection.html#adding-and-removing-items) 
 
@@ -32,27 +32,27 @@ Here is a very basic example that you can customize:
 
 ```twig
 {% block _quiz_questions_widget %}  
-<ul id="question-fields-list" 
-  data-prototype="{{ form_widget(form.vars.prototype)|e }}" 
-  data-counter="{{ form|length }}">  
-  {% for question in form %}  
-      {{ form_widget(question) }}  
-  {% endfor %}  
-</ul>  
-  
-<button type="button" 
-  data-target="#question-fields-list" 
-  id="add-question-widget">Add</button>  
+  <ul id="question-fields-list" 
+    data-prototype="{{ form_widget(form.vars.prototype)|e }}" 
+    data-counter="{{ form|length }}">  
+    {% for question in form %}  
+        {{ form_widget(question) }}  
+    {% endfor %}  
+  </ul>  
+    
+  <button type="button" 
+    data-target="#question-fields-list" 
+    id="add-question-widget">Add</button>  
 {% endblock %}  
   
 {% block _quiz_questions_entry_widget %}  
-<li id="{{id}}">  
-  {{form_row(form.question)}} 
-  {{form_row(form.answer)}} 
-  <button type="button" 
-    data-target="{{id}}" 
-    class="remove-question-widget"> Remove </button>  
-</li>
+  <li id="{{id}}">  
+    {{form_row(form.question)}} 
+    {{form_row(form.answer)}} 
+    <button type="button" 
+      data-target="{{id}}" 
+      class="remove-question-widget"> Remove </button>  
+  </li>
 {% endblock %}
 ```
 Pay attention to the HTML tags of the container's children in case you use the Sortable implementation. 
@@ -67,36 +67,57 @@ const QuizManager = new CollectionTypeManager({
   removeButtonsClassName: 'remove-question-widget', // the class of all the remove buttons
 });
 ```
-You can also configure callbacks for three events:
-```js
-let eventConfig = {
-  isBuilt: () => yourAfterBuiltFunction,  
-  afterAddElement: () => {  
-    // Here you can access to the new widget just added
-    QuizManager.getLastWidgetAdded();
-  },  
-  afterRemoveElement: () => yourAfterRemoveFunction
-}
-```
-### The Sortable Implementation (work in progress)
-*Only the simple list feature is tested for now.*
+### Events
+Collection-type-manager comes with an internal event manager to which you can connect from the subscriber property.
 
+Short example:
+```js
+const QuestionCollection = new CollectionTypeManager({
+  // prev code...
+  
+  // property subscriber is a callback wich return an instance of Subscriber
+  subscriber: function () {
+      let subscriber = new Subscriber(); // Instantiate a subscriber
+      subscriber.subscribe('after.add.widget', function () {
+        // Your logic...
+        
+        // In 'after.add.widget' event, you have access to the widget just added
+        let lastWdget = QuestionCollection.getLastWidgetAdded();
+        
+      });
+
+      return subscriber;
+  }
+```
+You can directly pass the name of the event you want to connect to but you can also pass an array of events 
+to execute the same action at several points in the workflow.
+
+Events available: `mount`, `before.add.widget`, `after.add.widget`, `before.remove.widget`, `after.remove.widget`
+
+### The Sortable Implementation
 The collection type manager component implement the library Sortable:
+
+*Partially tested implementation: only the simple list and handle features are tested for now.*
+
 Some examples of UX possibilities: https://sortablejs.github.io/Sortable
+
 
 To enable Sortable, you must set the `enableSortable` option to `true`. 
 You can change the default configuration and connect to Sortable events using the `sortableConfig` property.
 
+Sortable options: https://github.com/SortableJS/Sortable#options
+
 Example:
 ```js
-  
-let sortableConfig = {  
-  onEnd: function (/**Event*/evt) {  
-      // Your logic
-  },  
-}
+const QuestionCollection = new CollectionTypeManager({
+  // prev code...
+  sortableConfig: {  
+    onEnd: function (/**Event*/evt) {  
+        // Your logic
+    },
+    transition: 300
+};
 ```
 When using Sortable, the names of your form fields are automatically updated to respect the order you have chosen. So you don't have to worry about your request to process your form data.
-Github Options: https://github.com/SortableJS/Sortable#options
 
 *PR and constructive criticism are welcome :)*
