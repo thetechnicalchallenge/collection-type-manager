@@ -58,6 +58,11 @@ Here is a very basic example that you can customize:
 Pay attention to the HTML tags of the container's children in case you use the Sortable implementation. 
 An `ul` container cannot have `div` children. Use a `div` container if you want `div` children.
 
+In addition, the collection elements must be directly children of the container like in the example above:
+```html
+<ul id="question-fields-list" /.../ > <li id="{{id}}"> ... </li> </ul>
+```
+
 ### Basic configuration
 Here is what the minimum configuration looks like:
 ```js
