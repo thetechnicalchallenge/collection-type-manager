@@ -61,6 +61,8 @@ An `ul` container cannot have `div` children. Use a `div` container if you want 
 ### Basic configuration
 Here is what the minimum configuration looks like:
 ```js
+import CollectionTypeManager from "collection-type-manager";
+
 const QuizManager = new CollectionTypeManager({  
   containerId: 'question-fields-list', // the container id of your collection
   addButtonId: 'add-question-widget', // the button id for adding a widget
@@ -72,6 +74,9 @@ Collection-type-manager comes with an internal event manager to which you can co
 
 Short example:
 ```js
+import CollectionTypeManager from "collection-type-manager";
+import Subscriber from "collection-type-manager/dist/Subscriber";
+
 const QuestionCollection = new CollectionTypeManager({
   // prev code...
   
@@ -109,6 +114,8 @@ Sortable options: https://github.com/SortableJS/Sortable#options
 
 Example:
 ```js
+import CollectionTypeManager from "collection-type-manager";
+
 const QuestionCollection = new CollectionTypeManager({
   // prev code...
   sortableConfig: {  
