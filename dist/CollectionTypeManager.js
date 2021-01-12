@@ -131,7 +131,7 @@ var CollectionTypeManager = /*#__PURE__*/function () {
     key: "getSortable",
     value: function getSortable() {
       if (!this.settings.enableSortable) {
-        console.log(new Error('You must set "enableSortable" to true for using this feature.'));
+        throw new Error('You must set "enableSortable" to true for using this feature.');
       }
 
       return this.sortable;
