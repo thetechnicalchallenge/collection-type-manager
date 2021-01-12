@@ -93,6 +93,7 @@ const QuestionCollection = new CollectionTypeManager({
 
       return subscriber;
   }
+});
 ```
 You can directly pass the name of the event you want to connect to but you can also pass an array of events 
 to execute the same action at several points in the workflow.
@@ -118,12 +119,14 @@ import CollectionTypeManager from "collection-type-manager";
 
 const QuestionCollection = new CollectionTypeManager({
   // prev code...
+  enableSortable: true,
   sortableConfig: {  
     onEnd: function (/**Event*/evt) {  
         // Your logic
     },
-    transition: 300
-};
+    animation: 300
+  }
+});
 ```
 When using Sortable, the names of your form fields are automatically updated to respect the order you have chosen. So you don't have to worry about your request to process your form data.
 
