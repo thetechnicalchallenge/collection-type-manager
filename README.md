@@ -82,7 +82,7 @@ const QuestionCollection = new CollectionTypeManager({
         // Your logic...
         
         // In 'after.add.widget' event, you have access to the widget just added
-        let lastWdget = QuestionCollection.getLastWidgetAdded();
+        let lastWidget = QuestionCollection.getLastWidgetAdded();
         
       });
 
