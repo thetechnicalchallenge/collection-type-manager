@@ -84,7 +84,7 @@ const QuestionCollection = new CollectionTypeManager({
   
   // property subscriber is a callback wich return an instance of Subscriber
   subscriber: function () {
-      let subscriber = new Subscriber(); // Instantiate a subscriber
+      const subscriber = new Subscriber(); // Instantiate a subscriber
       subscriber.subscribe('after.add.widget', function () {
         // Your logic...
         

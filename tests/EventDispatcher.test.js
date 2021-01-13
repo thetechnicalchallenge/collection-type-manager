@@ -2,7 +2,7 @@ import Subscriber from "../src/Subscriber";
 import EventDispatcher from "../src/EventDispatcher";
 
 test('subscriber is not instance of Subscriber', () => {
-    let eventDispatcher = new EventDispatcher();
+    const eventDispatcher = new EventDispatcher();
 
     expect(() => {
         eventDispatcher.addSubscriber('subscriber');
@@ -10,9 +10,9 @@ test('subscriber is not instance of Subscriber', () => {
 });
 
 test('subscribers are registered', () => {
-    let eventDispatcher = new EventDispatcher();
-    let subscriber = new Subscriber();
-    let subscriber2 = new Subscriber();
+    const eventDispatcher = new EventDispatcher();
+    const subscriber = new Subscriber();
+    const subscriber2 = new Subscriber();
     eventDispatcher.addSubscriber(subscriber)
     eventDispatcher.addSubscriber(subscriber2)
 
@@ -20,8 +20,8 @@ test('subscribers are registered', () => {
 });
 
 test('successful event dispatch', () => {
-    let eventDispatcher = new EventDispatcher();
-    let subscriber = new Subscriber();
+    const eventDispatcher = new EventDispatcher();
+    const subscriber = new Subscriber();
 
     let text = '';
     subscriber.subscribe('mount', () => {
