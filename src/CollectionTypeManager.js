@@ -1,11 +1,11 @@
-/**
- * @author thetechnicalchallenge@gmail.com
- */
 import Sortable from "sortablejs";
 import EventDispatcher from "./EventDispatcher";
 import Subscriber from "./Subscriber";
 import SortableEventAdapter from "./SortableEventAdapter";
 
+/**
+ * @author thetechnicalchallenge@gmail.com
+ */
 export default class CollectionTypeManager {
     constructor(settings = {
         containerId: '',

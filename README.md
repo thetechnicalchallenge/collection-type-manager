@@ -24,12 +24,9 @@ $builder
 ;
 ```
 ### Twig Form Theme
-The easiest way to create your design is to create a [form theme](https://symfony.com/doc/current/form/form_themes.html). For this example, I propose you to implement a theme in [the same template as your form](https://symfony.com/doc/current/form/form_themes.html#creating-a-form-theme-in-the-same-template-as-the-form). 
-Take the time to consult the cited links in order to understand the rest of the documentation and adapt according to your preferences or needs.
+The easiest way to create your design is to create a [form theme](https://symfony.com/doc/current/form/form_themes.html). For this example, I propose you to implement a theme in [the same template as your form](https://symfony.com/doc/current/form/form_themes.html#creating-a-form-theme-in-the-same-template-as-the-form).
 
 Here is a very basic example that you can customize:
-*As you can see, the name of your field must begin with an underscore "_" and be converted to [snake case](https://en.wikipedia.org/wiki/Snake_case) format*.
-
 ```twig
 {% block _quiz_questions_widget %}  
   <ul id="question-fields-list" 
@@ -95,6 +92,10 @@ const QuestionCollection = new CollectionTypeManager({
         let lastWidget = QuestionCollection.getLastWidgetAdded();
         
       });
+      
+      subscriber.subscribe('after.remove.widget', function () {
+        // Your logic...        
+      });
 
       return subscriber;
   }
@@ -106,12 +107,11 @@ to execute the same action at several points in the workflow.
 Events available: `mount`, `before.add.widget`, `after.add.widget`, `before.remove.widget`, `after.remove.widget`
 
 ### The Sortable Implementation
-The collection type manager component implement the library Sortable:
-
 *Partially tested implementation: only the simple list and handle features are tested for now.*
 
-Some examples of UX possibilities: https://sortablejs.github.io/Sortable
+The collection type manager component implement the library Sortable:
 
+Some examples of UX possibilities: https://sortablejs.github.io/Sortable
 
 To enable Sortable, you must set the `enableSortable` option to `true`. 
 You can change the default configuration and connect to Sortable events using the `sortableConfig` property.
@@ -135,4 +135,8 @@ const QuestionCollection = new CollectionTypeManager({
 ```
 When using Sortable, the names of your form fields are automatically updated to respect the order you have chosen. So you don't have to worry about your request to process your form data.
 
-*PR and constructive criticism are welcome :)*
+*Feel free to suggest a PR, advices or simply add a star to the [GitHub repository](https://github.com/thetechnicalchallenge/collection-type-manager) if this library seems relevant to you.* 
+
+Cheers.
+
+Contact: thetechnicalchallenge@gmail.com
