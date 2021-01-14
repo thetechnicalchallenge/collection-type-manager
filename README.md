@@ -135,6 +135,15 @@ const QuestionCollection = new CollectionTypeManager({
 ```
 When using Sortable, the names of your form fields are automatically updated to respect the order you have chosen. So you don't have to worry about your request to process your form data.
 
+### Temporary bug
+You must at least add the following code to have the field names filtered automatically.
+```js
+  sortableConfig: {
+      onEnd: function () {
+      }
+  },
+```
+
 *Feel free to suggest a PR, advices or simply add a star to the [GitHub repository](https://github.com/thetechnicalchallenge/collection-type-manager) if this library seems relevant to you.* 
 
 Cheers.
