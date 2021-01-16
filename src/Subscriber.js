@@ -6,8 +6,8 @@ export default class Subscriber {
             'mount',
             'before.add.widget',
             'after.add.widget',
-            'after.remove.widget',
-            'before.remove.widget'
+            'before.remove.widget',
+            'after.remove.widget'
         ];
     }
 

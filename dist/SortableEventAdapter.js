@@ -32,9 +32,7 @@ var SortableEventAdapter = /*#__PURE__*/function () {
       var config = _objectSpread({}, sortableConfig);
 
       this.events.forEach(function (event) {
-        if (sortableConfig && sortableConfig.hasOwnProperty(event)) {
-          _this.attach(collectionTypeManager, event, config, sortableConfig);
-        }
+        _this.attach(collectionTypeManager, event, config, sortableConfig);
       });
       return config;
     }
@@ -45,7 +43,10 @@ var SortableEventAdapter = /*#__PURE__*/function () {
         case 'onEnd':
           config[event] = function (evt) {
             collectionTypeManager.sortFieldNames();
-            sortableConfig[event](evt);
+
+            if (sortableConfig.hasOwnProperty(event)) {
+              sortableConfig[event](evt);
+            }
           };
 
           break;

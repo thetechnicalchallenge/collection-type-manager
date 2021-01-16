@@ -8,9 +8,7 @@ export default class SortableEventAdapter {
         let config = {...sortableConfig};
 
         this.events.forEach(event => {
-            if (sortableConfig && sortableConfig.hasOwnProperty(event)) {
-                this.attach(collectionTypeManager, event, config, sortableConfig);
-            }
+            this.attach(collectionTypeManager, event, config, sortableConfig);
         });
 
         return config;
@@ -22,7 +20,9 @@ export default class SortableEventAdapter {
             case 'onEnd':
                 config[event] = (evt) => {
                     collectionTypeManager.sortFieldNames();
-                    sortableConfig[event](evt);
+                    if (sortableConfig.hasOwnProperty(event)) {
+                        sortableConfig[event](evt);
+                    }
                 }
                 break;
         }
