@@ -1,4 +1,4 @@
-import Sortable from "sortablejs";
+import Sortable from "./sortable";
 import EventDispatcher from "./EventDispatcher";
 import Subscriber from "./Subscriber";
 import SortableEventAdapter from "./SortableEventAdapter";
