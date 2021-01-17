@@ -5,7 +5,7 @@ export default class SortableEventAdapter {
 
     adapt(collectionTypeManager, sortableConfig)
     {
-        let config = {...sortableConfig};
+        let config = sortableConfig === undefined ? {} : {...sortableConfig};
 
         this.events.forEach(event => {
             this.attach(collectionTypeManager, event, config, sortableConfig);
@@ -20,7 +20,7 @@ export default class SortableEventAdapter {
             case 'onEnd':
                 config[event] = (evt) => {
                     collectionTypeManager.sortFieldNames();
-                    if (sortableConfig.hasOwnProperty(event)) {
+                    if (sortableConfig !== undefined && sortableConfig.hasOwnProperty(event)) {
                         sortableConfig[event](evt);
                     }
                 }

@@ -29,8 +29,7 @@ var SortableEventAdapter = /*#__PURE__*/function () {
     value: function adapt(collectionTypeManager, sortableConfig) {
       var _this = this;
 
-      var config = _objectSpread({}, sortableConfig);
-
+      var config = sortableConfig === undefined ? {} : _objectSpread({}, sortableConfig);
       this.events.forEach(function (event) {
         _this.attach(collectionTypeManager, event, config, sortableConfig);
       });
@@ -44,7 +43,7 @@ var SortableEventAdapter = /*#__PURE__*/function () {
           config[event] = function (evt) {
             collectionTypeManager.sortFieldNames();
 
-            if (sortableConfig.hasOwnProperty(event)) {
+            if (sortableConfig !== undefined && sortableConfig.hasOwnProperty(event)) {
               sortableConfig[event](evt);
             }
           };

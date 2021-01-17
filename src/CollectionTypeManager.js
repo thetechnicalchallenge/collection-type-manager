@@ -11,9 +11,9 @@ export default class CollectionTypeManager {
         containerId: '',
         addButtonId: '',
         removeButtonsClassName: '',
-        subscriber: Subscriber,
+        subscriber: null,
         enableSortable: false,
-        sortableConfig: {}
+        sortableConfig: null
     }) {
         this.settings = settings;
         this.eventDispatcher = new EventDispatcher();

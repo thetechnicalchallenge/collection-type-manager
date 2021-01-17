@@ -27,9 +27,9 @@ var CollectionTypeManager = /*#__PURE__*/function () {
       containerId: '',
       addButtonId: '',
       removeButtonsClassName: '',
-      subscriber: _Subscriber.default,
+      subscriber: null,
       enableSortable: false,
-      sortableConfig: {}
+      sortableConfig: null
     };
 
     _classCallCheck(this, CollectionTypeManager);
