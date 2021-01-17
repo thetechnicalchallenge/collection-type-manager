@@ -27,29 +27,17 @@ var SortableEventAdapter = /*#__PURE__*/function () {
   _createClass(SortableEventAdapter, [{
     key: "adapt",
     value: function adapt(collectionTypeManager, sortableConfig) {
-      var _this = this;
-
       var config = sortableConfig === undefined ? {} : _objectSpread({}, sortableConfig);
-      this.events.forEach(function (event) {
-        _this.attach(collectionTypeManager, event, config, sortableConfig);
-      });
+
+      config.onEnd = function (evt) {
+        collectionTypeManager.sortFieldNames();
+
+        if (sortableConfig !== undefined && Object.prototype.hasOwnProperty.call(sortableConfig, 'onEnd')) {
+          sortableConfig.onEnd(evt);
+        }
+      };
+
       return config;
-    }
-  }, {
-    key: "attach",
-    value: function attach(collectionTypeManager, event, config, sortableConfig) {
-      switch (event) {
-        case 'onEnd':
-          config[event] = function (evt) {
-            collectionTypeManager.sortFieldNames();
-
-            if (sortableConfig !== undefined && sortableConfig.hasOwnProperty(event)) {
-              sortableConfig[event](evt);
-            }
-          };
-
-          break;
-      }
     }
   }]);
 

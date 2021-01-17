@@ -1,30 +1,27 @@
-import Subscriber from "./Subscriber";
+import Subscriber from './Subscriber';
 
 export default class EventDispatcher {
-    constructor() {
-        this.subscribers = [];
+  constructor () {
+    this.subscribers = [];
+  }
+
+  addSubscriber (subscriber) {
+    if (subscriber instanceof Subscriber === false) {
+      throw new Error('Argument must be type of Subscriber');
     }
 
-    addSubscriber(subscriber)
-    {
-        if (!(subscriber instanceof Subscriber)) {
-            throw new Error("Argument must be an an instance of Subscriber");
-        }
+    this.subscribers.push(subscriber);
+  }
 
-        this.subscribers.push(subscriber);
+  dispatch (event) {
+    for (const key in this.subscribers) {
+      if (this.subscribers[key].has(event)) {
+        this.subscribers[key].call(event);
+      }
     }
+  }
 
-    dispatch(event)
-    {
-        this.subscribers.forEach(subscriber => {
-            if (subscriber.has(event)) {
-                subscriber.call(event);
-            }
-        })
-    }
-
-    getSubscribers()
-    {
-        return this.subscribers;
-    }
+  getSubscribers () {
+    return this.subscribers;
+  }
 }

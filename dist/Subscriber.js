@@ -16,17 +16,17 @@ var Subscriber = /*#__PURE__*/function () {
     _classCallCheck(this, Subscriber);
 
     this.subscriptions = [];
-    this.eventTags = ['mount', 'before.add.widget', 'after.add.widget', 'after.remove.widget', 'before.remove.widget'];
+    this.eventTags = ['mount', 'before.add.widget', 'after.add.widget', 'before.remove.widget', 'after.remove.widget'];
   }
 
   _createClass(Subscriber, [{
     key: "subscribe",
     value: function subscribe(event, action) {
-      if (!(action instanceof Function)) {
+      if (typeof action !== 'function') {
         throw new Error('Second argument must be a function');
       }
 
-      if (event instanceof Array) {
+      if (Array.isArray(event)) {
         for (var i = 0; i < event.length; i++) {
           this.subscribe(event[i], action);
         }

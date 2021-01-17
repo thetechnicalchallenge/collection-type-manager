@@ -25,8 +25,8 @@ var EventDispatcher = /*#__PURE__*/function () {
   _createClass(EventDispatcher, [{
     key: "addSubscriber",
     value: function addSubscriber(subscriber) {
-      if (!(subscriber instanceof _Subscriber.default)) {
-        throw new Error("Argument must be an an instance of Subscriber");
+      if (subscriber instanceof _Subscriber.default === false) {
+        throw new Error('Argument must be type of Subscriber');
       }
 
       this.subscribers.push(subscriber);
@@ -34,11 +34,11 @@ var EventDispatcher = /*#__PURE__*/function () {
   }, {
     key: "dispatch",
     value: function dispatch(event) {
-      this.subscribers.forEach(function (subscriber) {
-        if (subscriber.has(event)) {
-          subscriber.call(event);
+      for (var key in this.subscribers) {
+        if (this.subscribers[key].has(event)) {
+          this.subscribers[key].call(event);
         }
-      });
+      }
     }
   }, {
     key: "getSubscribers",

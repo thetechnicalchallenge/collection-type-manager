@@ -2,9 +2,13 @@
   "name": "collection-type-manager",
   "version": "1.0.8",
   "description": "Javascript library to easily interact with Symfony CollectionType Field https://symfony.com/doc/current/reference/forms/types/collection.html#adding-and-removing-items",
-  "main": "dist/CollectionTypeManager.js",
+  "main": "src/CollectionTypeManager.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev-server": "encore dev-server",
+    "dev": "encore dev",
+    "watch": "encore dev --watch",
+    "build": "encore production --progress"
   },
   "repository": {
     "type": "git",
@@ -24,10 +28,16 @@
   "homepage": "https://github.com/thetechnicalchallenge/collection-type-manager#readme",
   "dependencies": {
     "@babel/preset-env": "^7.12.11",
+    "@symfony/webpack-encore": "^0.33.0",
     "babel": "^6.23.0",
     "babel-cli": "^6.26.0",
     "core-js": "^3.8.2",
     "jest": "^26.6.3",
-    "sortablejs": "^1.13.0"
+    "semistandard": "^16.0.0",
+    "sortablejs": "^1.13.0",
+    "standard": "^16.0.3"
+  },
+  "devDependencies": {
+    "webpack-notifier": "^1.12.0"
   }
 }

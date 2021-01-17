@@ -1,75 +1,69 @@
 
 export default class Subscriber {
-    constructor() {
-        this.subscriptions = [];
-        this.eventTags = [
-            'mount',
-            'before.add.widget',
-            'after.add.widget',
-            'before.remove.widget',
-            'after.remove.widget'
-        ];
+  constructor () {
+    this.subscriptions = [];
+    this.eventTags = [
+      'mount',
+      'before.add.widget',
+      'after.add.widget',
+      'before.remove.widget',
+      'after.remove.widget'
+    ];
+  }
+
+  subscribe (event, action) {
+    if (typeof action !== 'function') {
+      throw new Error('Second argument must be a function');
     }
 
-    subscribe(event, action)
-    {
-        if (!(action instanceof Function)) {
-            throw new Error('Second argument must be a function');
-        }
+    if (Array.isArray(event)) {
+      for (let i = 0; i < event.length; i++) {
+        this.subscribe(event[i], action);
+      }
 
-        if (event instanceof Array) {
-            for (let i = 0; i < event.length; i++) {
-                this.subscribe(event[i], action)
-            }
-
-            return;
-        }
-
-        this.checkIfEventTagAvailable(event);
-
-        if (this.subscriptions[event] === undefined) {
-            this.subscriptions[event] = [];
-        }
-
-        this.subscriptions[event].push(action);
+      return;
     }
 
-    has(event)
-    {
-        return this.subscriptions[event] !== undefined;
+    this.checkIfEventTagAvailable(event);
+
+    if (this.subscriptions[event] === undefined) {
+      this.subscriptions[event] = [];
     }
 
-    call(event)
-    {
-        this.checkIfEventTagAvailable(event);
+    this.subscriptions[event].push(action);
+  }
 
-        if (!this.has(event)) {
-            throw new Error(`Event ${event} has no subscription`);
-        }
+  has (event) {
+    return this.subscriptions[event] !== undefined;
+  }
 
-        this.subscriptions[event].forEach(callback => {
-            try {
-                callback();
-            } catch (e) {
-                throw new Error(e);
-            }
-        })
+  call (event) {
+    this.checkIfEventTagAvailable(event);
+
+    if (!this.has(event)) {
+      throw new Error(`Event ${event} has no subscription`);
     }
 
-    checkIfEventTagAvailable(event)
-    {
-        if (!this.eventTags.includes(event)) {
-            throw new Error(`Event ${event} is not available`);
-        }
-    }
+    this.subscriptions[event].forEach(callback => {
+      try {
+        callback();
+      } catch (e) {
+        throw new Error(e);
+      }
+    });
+  }
 
-    getSubscriptions()
-    {
-        return this.subscriptions;
+  checkIfEventTagAvailable (event) {
+    if (!this.eventTags.includes(event)) {
+      throw new Error(`Event ${event} is not available`);
     }
+  }
 
-    getEventTags()
-    {
-        return this.eventTags;
-    }
+  getSubscriptions () {
+    return this.subscriptions;
+  }
+
+  getEventTags () {
+    return this.eventTags;
+  }
 }

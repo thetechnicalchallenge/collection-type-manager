@@ -6,7 +6,7 @@ test('subscriber is not instance of Subscriber', () => {
 
     expect(() => {
         eventDispatcher.addSubscriber('subscriber');
-    }).toThrow("Argument must be an an instance of Subscriber");
+    }).toThrow("Argument must be type of Subscriber");
 });
 
 test('subscribers are registered', () => {

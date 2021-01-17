@@ -1,0 +1,5 @@
+{
+  "cdn/app.js": "/cdn/app.js",
+  "cdn/runtime.js": "/cdn/runtime.js",
+  "cdn/vendors~app.js": "/cdn/vendors~app.js"
+}

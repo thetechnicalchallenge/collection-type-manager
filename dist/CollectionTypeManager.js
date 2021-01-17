@@ -38,7 +38,7 @@ var CollectionTypeManager = /*#__PURE__*/function () {
     this.eventDispatcher = new _EventDispatcher.default();
     this.eventDispatcher.addSubscriber(this.configureInternalSubscriber());
 
-    if (settings.subscriber instanceof Function) {
+    if (typeof settings.subscriber === 'function') {
       this.eventDispatcher.addSubscriber(settings.subscriber());
     }
 
@@ -114,7 +114,7 @@ var CollectionTypeManager = /*#__PURE__*/function () {
       this.fields = [];
       var collectionItems = Array.from(this.container.children);
       collectionItems.forEach(function (item, indexA) {
-        var fields = Array.from(item.querySelectorAll("select, textarea, input"));
+        var fields = Array.from(item.querySelectorAll('select, textarea, input'));
         fields.forEach(function (child) {
           child.name = child.name.replace(/\[(\d+)\]/g, "[".concat(indexA, "]"));
 
