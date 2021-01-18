@@ -54,7 +54,9 @@ var CollectionTypeManager = /*#__PURE__*/function () {
       this.sortable = _sortablejs.default.create(this.container, config);
     }
 
-    this.eventDispatcher.dispatch('mount');
+    setTimeout(() => {
+      this.eventDispatcher.dispatch('mount');
+    }, 50);
   }
 
   _createClass(CollectionTypeManager, [{
