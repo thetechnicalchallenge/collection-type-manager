@@ -1,4 +1,5 @@
 # Collection Type Manager
+> Look a the prev commit for the current doc
 Javascript library to easily interact with [Symfony CollectionType Field](https://symfony.com/doc/current/reference/forms/types/collection.html) 
 
 * [Installation](#installation)
