@@ -1,18 +1,18 @@
-"use strict";
+'use strict';
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
 });
 exports.default = void 0;
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+function _defineProperties (target, props) { for (let i = 0; i < props.length; i++) { const descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+function _createClass (Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-var Subscriber = /*#__PURE__*/function () {
-  function Subscriber() {
+const Subscriber = /* #__PURE__ */(function () {
+  function Subscriber () {
     _classCallCheck(this, Subscriber);
 
     this.subscriptions = [];
@@ -20,14 +20,14 @@ var Subscriber = /*#__PURE__*/function () {
   }
 
   _createClass(Subscriber, [{
-    key: "subscribe",
-    value: function subscribe(event, action) {
+    key: 'subscribe',
+    value: function subscribe (event, action) {
       if (typeof action !== 'function') {
         throw new Error('Second argument must be a function');
       }
 
       if (Array.isArray(event)) {
-        for (var i = 0; i < event.length; i++) {
+        for (let i = 0; i < event.length; i++) {
           this.subscribe(event[i], action);
         }
 
@@ -43,17 +43,17 @@ var Subscriber = /*#__PURE__*/function () {
       this.subscriptions[event].push(action);
     }
   }, {
-    key: "has",
-    value: function has(event) {
+    key: 'has',
+    value: function has (event) {
       return this.subscriptions[event] !== undefined;
     }
   }, {
-    key: "call",
-    value: function call(event) {
+    key: 'call',
+    value: function call (event) {
       this.checkIfEventTagAvailable(event);
 
       if (!this.has(event)) {
-        throw new Error("Event ".concat(event, " has no subscription"));
+        throw new Error('Event '.concat(event, ' has no subscription'));
       }
 
       this.subscriptions[event].forEach(function (callback) {
@@ -65,25 +65,25 @@ var Subscriber = /*#__PURE__*/function () {
       });
     }
   }, {
-    key: "checkIfEventTagAvailable",
-    value: function checkIfEventTagAvailable(event) {
+    key: 'checkIfEventTagAvailable',
+    value: function checkIfEventTagAvailable (event) {
       if (!this.eventTags.includes(event)) {
-        throw new Error("Event ".concat(event, " is not available"));
+        throw new Error('Event '.concat(event, ' is not available'));
       }
     }
   }, {
-    key: "getSubscriptions",
-    value: function getSubscriptions() {
+    key: 'getSubscriptions',
+    value: function getSubscriptions () {
       return this.subscriptions;
     }
   }, {
-    key: "getEventTags",
-    value: function getEventTags() {
+    key: 'getEventTags',
+    value: function getEventTags () {
       return this.eventTags;
     }
   }]);
 
   return Subscriber;
-}();
+}());
 
 exports.default = Subscriber;

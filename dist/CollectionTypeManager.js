@@ -3,6 +3,18 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+Object.defineProperty(exports, "Subscriber", {
+  enumerable: true,
+  get: function () {
+    return _Subscriber.default;
+  }
+});
+Object.defineProperty(exports, "ChildCollection", {
+  enumerable: true,
+  get: function () {
+    return _ChildCollection.default;
+  }
+});
 exports.default = void 0;
 
 var _sortablejs = _interopRequireDefault(require("sortablejs"));
@@ -13,28 +25,24 @@ var _Subscriber = _interopRequireDefault(require("./Subscriber"));
 
 var _SortableEventAdapter = _interopRequireDefault(require("./SortableEventAdapter"));
 
+var _ChildCollection = _interopRequireDefault(require("./ChildCollection"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-var CollectionTypeManager = /*#__PURE__*/function () {
-  function CollectionTypeManager() {
-    var settings = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
-      containerId: '',
-      addButtonId: '',
-      removeButtonsClassName: '',
-      subscriber: null,
-      enableSortable: false,
-      sortableConfig: null
-    };
-
-    _classCallCheck(this, CollectionTypeManager);
-
-    this.settings = settings;
+/**
+ * @author thetechnicalchallenge@gmail.com
+ */
+class CollectionTypeManager {
+  constructor(settings = {
+    containerId: '',
+    addButtonId: '',
+    removeButtonsClassName: '',
+    subscriber: null,
+    enableSortable: false,
+    sortableConfig: null,
+    childCollectionList: null
+  }) {
+    this._settings = settings;
     this.eventDispatcher = new _EventDispatcher.default();
     this.eventDispatcher.addSubscriber(this.configureInternalSubscriber());
 
@@ -42,105 +50,127 @@ var CollectionTypeManager = /*#__PURE__*/function () {
       this.eventDispatcher.addSubscriber(settings.subscriber());
     }
 
-    this.container = document.getElementById(settings.containerId);
-    this.widgetPrototype = this.container.dataset.prototype;
-    this.counter = this.container.dataset.counter;
-    this.fields = [];
-    this.lastWidgetAdded = null;
+    this._container = document.getElementById(settings.containerId);
+    this._widgetPrototype = this._container.dataset.prototype;
+    this._counter = this._container.dataset.counter;
+    this._widgets = this._container.children;
+    this._fields = [];
+    this._lastWidgetAdded = null;
     this.bindListeners(document.getElementById(settings.addButtonId), Array.from(document.getElementsByClassName(settings.removeButtonsClassName)));
 
     if (settings.enableSortable) {
-      var config = new _SortableEventAdapter.default().adapt(this, settings.sortableConfig);
-      this.sortable = _sortablejs.default.create(this.container, config);
+      const config = new _SortableEventAdapter.default().adapt(this, settings.sortableConfig);
+      this.sortable = _sortablejs.default.create(this._container, config);
     }
 
-    setTimeout(() => {
-      this.eventDispatcher.dispatch('mount');
-    }, 50);
+    if (settings.childCollectionList) {
+      this.manageChildCollection(settings.childCollectionList);
+    }
+
+    this.eventDispatcher.dispatch('mount');
   }
 
-  _createClass(CollectionTypeManager, [{
-    key: "configureInternalSubscriber",
-    value: function configureInternalSubscriber() {
-      var internalSubscriber = new _Subscriber.default();
-      internalSubscriber.subscribe(['mount', 'after.add.widget', 'after.remove.widget'], this.sortFieldNames.bind(this));
-      return internalSubscriber;
+  manageChildCollection(childCollectionList) {
+    if (childCollectionList instanceof _ChildCollection.default !== false) {
+      throw new Error(`Unexpected type for childCollection property, expected "ChildCollection", "${typeof childCollectionList}" given`);
     }
-  }, {
-    key: "bindListeners",
-    value: function bindListeners(addButton, removeButtons) {
-      var _this = this;
 
-      addButton.addEventListener('click', this.addElement.bind(this));
-      removeButtons.forEach(function (removeButton) {
-        removeButton.addEventListener('click', _this.removeElement.bind(_this, removeButton));
-      });
-    }
-  }, {
-    key: "addElement",
-    value: function addElement() {
-      this.eventDispatcher.dispatch('before.add.widget');
-      var widgetContainer = document.createElement('div');
-      widgetContainer.innerHTML = this.widgetPrototype.replace(/__name__/g, this.counter);
-      var removeButton = widgetContainer.children[0].getElementsByClassName(this.settings.removeButtonsClassName)[0];
-      removeButton.addEventListener('click', this.removeElement.bind(this, removeButton));
-      this.lastWidgetAdded = widgetContainer.children[0];
-      this.container.appendChild(widgetContainer.children[0]);
-      this.counter++;
-      this.eventDispatcher.dispatch('after.add.widget');
-    }
-  }, {
-    key: "removeElement",
-    value: function removeElement(removeButton) {
-      this.eventDispatcher.dispatch('before.remove.widget');
-      var targetElement = document.getElementById(removeButton.dataset.target);
-      removeButton.removeEventListener('click', this.removeElement.bind(this, removeButton));
-      this.container.removeChild(targetElement);
-      this.eventDispatcher.dispatch('after.remove.widget');
-    }
-  }, {
-    key: "getLastWidgetAdded",
-    value: function getLastWidgetAdded() {
-      return this.lastWidgetAdded;
-    }
-  }, {
-    key: "getFields",
-    value: function getFields() {
-      return this.fields;
-    }
-  }, {
-    key: "sortFieldNames",
-    value: function sortFieldNames() {
-      var _this2 = this;
-
-      this.fields = [];
-      var collectionItems = Array.from(this.container.children);
-      collectionItems.forEach(function (item, indexA) {
-        var fields = Array.from(item.querySelectorAll('select, textarea, input'));
-        fields.forEach(function (child) {
-          child.name = child.name.replace(/\[(\d+)\]/g, "[".concat(indexA, "]"));
-
-          _this2.fields.push(child);
+    childCollectionList.forEach(childCollection => {
+      childCollection.getCollection().forEach(child => {
+        const ChildCollection = new CollectionTypeManager({
+          containerId: child.id,
+          addButtonId: childCollection.getAddButtonPrefix() + child.id,
+          removeButtonsClassName: childCollection.getRemoveButtonPrefix() + child.id
         });
       });
-    }
-  }, {
-    key: "getContainer",
-    value: function getContainer() {
-      return this.container;
-    }
-  }, {
-    key: "getSortable",
-    value: function getSortable() {
-      if (!this.settings.enableSortable) {
-        throw new Error('You must set "enableSortable" to true for using this feature.');
-      }
+      const subscriber = new _Subscriber.default();
+      subscriber.subscribe('after.add.widget', () => {
+        const lastWidget = this.getLastWidgetAdded();
+        const child = lastWidget.querySelector(`.${childCollection.getContainerClassName()}`);
+        const ChildCollection = new CollectionTypeManager({
+          containerId: child.id,
+          addButtonId: childCollection.getAddButtonPrefix() + child.id,
+          removeButtonsClassName: childCollection.getRemoveButtonPrefix() + child.id
+        });
+      });
+      this.eventDispatcher.addSubscriber(subscriber);
+    });
+  }
 
-      return this.sortable;
-    }
-  }]);
+  configureInternalSubscriber() {
+    const internalSubscriber = new _Subscriber.default();
+    internalSubscriber.subscribe(['mount', 'after.add.widget', 'after.remove.widget'], this.sortFieldNames.bind(this));
+    return internalSubscriber;
+  }
 
-  return CollectionTypeManager;
-}();
+  bindListeners(addButton, removeButtons) {
+    addButton.addEventListener('click', this.addElement.bind(this));
+    removeButtons.forEach(removeButton => {
+      removeButton.addEventListener('click', this.removeElement.bind(this, removeButton));
+    });
+  }
+
+  addElement() {
+    this.eventDispatcher.dispatch('before.add.widget');
+    const widgetContainer = document.createElement('div');
+    widgetContainer.innerHTML = this._widgetPrototype.replace(/__name__/g, this._counter);
+    const removeButton = widgetContainer.children[0].getElementsByClassName(this._settings.removeButtonsClassName)[0];
+    removeButton.addEventListener('click', this.removeElement.bind(this, removeButton));
+    this._lastWidgetAdded = widgetContainer.children[0];
+
+    this._container.appendChild(widgetContainer.children[0]);
+
+    this._counter++;
+    this.eventDispatcher.dispatch('after.add.widget');
+  }
+
+  removeElement(removeButton) {
+    this.eventDispatcher.dispatch('before.remove.widget');
+    const targetElement = document.getElementById(removeButton.dataset.target);
+    removeButton.removeEventListener('click', this.removeElement.bind(this, removeButton));
+
+    this._container.removeChild(targetElement);
+
+    this.eventDispatcher.dispatch('after.remove.widget');
+  }
+
+  getWidgets() {
+    return this._widgets;
+  }
+
+  getLastWidgetAdded() {
+    return this._lastWidgetAdded;
+  }
+
+  getFields() {
+    return this._fields;
+  }
+
+  sortFieldNames() {
+    this._fields = [];
+    const collectionItems = Array.from(this._container.children);
+    collectionItems.forEach((item, indexA) => {
+      const fields = Array.from(item.querySelectorAll('select, textarea, input'));
+      fields.forEach(child => {
+        child.name = child.name.replace(/\[(\d+)\]/g, `[${indexA}]`);
+
+        this._fields.push(child);
+      });
+    });
+  }
+
+  getContainer() {
+    return this._container;
+  }
+
+  getSortable() {
+    if (!this._settings.enableSortable) {
+      throw new Error('You must set "enableSortable" to true for using this feature.');
+    }
+
+    return this.sortable;
+  }
+
+}
 
 exports.default = CollectionTypeManager;

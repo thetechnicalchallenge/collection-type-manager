@@ -1,7 +1,11 @@
-# collection-type-manager
-*You can consult this documentation on [this website](https://collection-type-manager.thetechnicalchallenge.com/) and see examples of use cases.*
+# Collection Type Manager
+Javascript library to easily interact with [Symfony CollectionType Field](https://symfony.com/doc/current/reference/forms/types/collection.html) 
 
-Javascript library to easily interact with [Symfony CollectionType Field](https://symfony.com/doc/current/reference/forms/types/collection.html#adding-and-removing-items) 
+* [Installation](#installation)
+* [Basic configuration](#basic-configuration)
+* [Event system](#event-system)
+* [Child collection](#child-collections)
+* [The Sortable implementation](#the-sortable-implementation)
 
 ## Installation
 ```bash
@@ -11,9 +15,13 @@ npm i collection-type-manager
 import CollectionTypeManager from "collection-type-manager";
 ```
 ## Usage
-In this documentation, we will use the example of a `QuizType` form with a `questions` field as a collection.
+In this documentation, we will use the example of a `QuizType` form with a `questions` field as a `CollectionType` 
+but feel free to adapt it to your logic. Later, `QuestionType` will contain an `options` field as a `CollectionType`, 
+this will allow you to understand how to manage child collections like for a MCQ.
 
-### In your Symfony FormType
+## Basic configuration
+
+### In QuizType
 First, set `allow_add` and `allow_delete` to true.
 ```php
 $builder  
@@ -25,22 +33,22 @@ $builder
 ;
 ```
 ### Twig Form Theme
-The easiest way to create your design is to create a [form theme](https://symfony.com/doc/current/form/form_themes.html). For this example, I propose you to implement a theme in [the same template as your form](https://symfony.com/doc/current/form/form_themes.html#creating-a-form-theme-in-the-same-template-as-the-form).
-
-Here is a very basic example that you can customize:
+The easiest way to create your design is to create a [form theme](https://symfony.com/doc/current/form/form_themes.html). 
+If you are not yet familiar with the form themes, I propose you to read the doc and to implement a theme in [the same template as your form](https://symfony.com/doc/current/form/form_themes.html#creating-a-form-theme-in-the-same-template-as-the-form)
+as a first step. [Fragment Naming for Collections](https://symfony.com/doc/current/form/form_themes.html#fragment-naming-for-collections) is the essential chapter to understand the twig code below, a very basic example that you can customize:
 ```twig
 {% block _quiz_questions_widget %}  
-  <ul id="question-fields-list" 
+  <ul id="question-list" 
     data-prototype="{{ form_widget(form.vars.prototype)|e }}" 
     data-counter="{{ form|length }}">  
     {% for question in form %}  
-        {{ form_widget(question) }}  
+      {{ form_widget(question) }}  
     {% endfor %}  
   </ul>  
     
   <button type="button" 
-    data-target="#question-fields-list" 
-    id="add-question-widget">Add</button>  
+    data-target="#question-list" 
+    id="add-question">Add</button>  
 {% endblock %}  
   
 {% block _quiz_questions_entry_widget %}  
@@ -49,68 +57,195 @@ Here is a very basic example that you can customize:
     {{form_row(form.answer)}} 
     <button type="button" 
       data-target="{{id}}" 
-      class="remove-question-widget"> Remove </button>  
+      class="remove-question"> Remove </button>  
   </li>
 {% endblock %}
 ```
-Pay attention to the HTML tags of the container's children in case you use the Sortable implementation. 
+Pay attention to the HTML tags of the container's children in case you use the [Sortable implementation](#the-sortable-implementation). 
 An `ul` container cannot have `div` children. Use a `div` container if you want `div` children.
 
-In addition, the collection elements must be directly children of the container like in the example above:
+In addition, the collection elements must be directly children of the container:
 ```html
-<ul id="question-fields-list" /.../ > <li id="{{id}}"> ... </li> </ul>
+<ul id="question-list" /.../ > <li> ... </li> </ul>
 ```
 
-### Basic configuration
+### CollectionTypeManager instantiation
 Here is what the minimum configuration looks like:
 ```js
 import CollectionTypeManager from "collection-type-manager";
 
-const QuizManager = new CollectionTypeManager({  
-  containerId: 'question-fields-list', // the container id of your collection
-  addButtonId: 'add-question-widget', // the button id for adding a widget
-  removeButtonsClassName: 'remove-question-widget', // the class of all the remove buttons
+const QuestionCollection = new CollectionTypeManager({  
+  containerId: 'question-list', // the container id of your collection
+  addButtonId: 'add-question', // the button id for adding a widget
+  removeButtonsClassName: 'remove-question', // the class of all the remove buttons
 });
+
 ```
-### Events
-Collection-type-manager comes with an internal event manager to which you can connect from the subscriber property.
+If your needs are basic, you know enough to use this library.
+
+## Event system
+
+The collection-type-manager library comes with an internal event manager to which you can connect from the `subscriber` property.
 
 Short example:
 ```js
-import CollectionTypeManager from "collection-type-manager";
-import Subscriber from "collection-type-manager/dist/Subscriber";
+import CollectionTypeManager, { Subscriber } from "collection-type-manager";
 
 const QuestionCollection = new CollectionTypeManager({
   // prev code...
   
   // property subscriber is a callback wich return an instance of Subscriber
   subscriber: function () {
-      const subscriber = new Subscriber(); // Instantiate a subscriber
-      subscriber.subscribe('after.add.widget', function () {
-        // Your logic...
-        
-        // In 'after.add.widget' event, you have access to the widget just added
-        let lastWidget = QuestionCollection.getLastWidgetAdded();
-        
-      });
+    const subscriber = new Subscriber();
+    subscriber.subscribe('after.add.widget', function () {
+      // Your logic...
       
-      subscriber.subscribe('after.remove.widget', function () {
-        // Your logic...        
-      });
+      // In 'after.add.widget' event, you can access the last added widget.
+      const lastWidget = QuestionCollection.getLastWidgetAdded();
+      
+    });
+    
+    subscriber.subscribe(['after.add.widget', 'after.remove.widget'], function () {
+      // Your logic...        
+    });
 
-      return subscriber;
+    return subscriber;
   }
 });
 ```
 You can directly pass the name of the event you want to connect to but you can also pass an array of events 
 to execute the same action at several points in the workflow.
 
-Events available: `mount`, `before.add.widget`, `after.add.widget`, `before.remove.widget`, `after.remove.widget`
+Events available: `mount`, `before.add.widget`, `after.add.widget`, `before.remove.widget`, `after.remove.widget`.
 
-### The Sortable Implementation
+> Be careful, `mount` is triggered at the end of the `constructor` method which means that the collection system is created but the instance
+> is not yet usable.
+
+## Child collections
+
+There are two main ways to manage child collections:
+* By configuring `ChildCollection` classes that will allow automatic management of your child collections
+* By instantiating your child collections yourself.
+
+The configuration of forms and twig blocks can be similar in both cases.
+
+### In QuestionType
+Following our example, we add an `options` field to `QuestionType`:
+```php
+$builder  
+  ->add('options', CollectionType::class, [  
+   'label' => false,  
+   'entry_type' => OptionType::class,  
+   'allow_add' => true,  
+   'allow_delete' => true,  
+  ])  
+;
+```
+
+### Form Theme for options collection
+After added `{{ form_row(form.options) }}` to the twig block `_quiz_questions_entry_widget`, we can create 
+the following blocks: 
+
+*Read again the chapter about [fragment naming for collections](https://symfony.com/doc/current/form/form_themes.html#fragment-naming-for-collections
+) if this twig code does not seem obvious to you yet.*
+
+```twig
+{% block _theme_questions_entry_options_widget %}
+  <div id="{{ id }}"
+    class="option-container" {# We retrieve all the option containers with a class. #}
+    data-prototype="{{ form_widget(form.vars.prototype)|e }}"
+    data-counter="{{ form|length }}">
+    {% for option in form %}
+        {{ form_widget(option) }}
+    {% endfor %}
+  </div>
+
+  <button type="button" id="add-{{ id }}">Add an option</button>
+{% endblock %}
+
+{% block _theme_questions_entry_options_entry_widget %}
+  <div id="{{ id }}">
+    {{ form_widget(form) }}
+    <button type="button"
+      data-target="{{ id }}"
+      class="remove-{{ form.parent.vars.id }}">
+      Remove
+    </button>
+  </div>
+{% endblock %}
+```
+
+### Custom child collections
+First, I will show you an example of a custom configuration to help you better understand how 
+`ChildCollection` classes work if you decide to use them.
+
+After instantiating the parent collection, we retrieve and instantiate the existing option collections.
+
+```js
+let options = Array.from(document.getElementsByClassName('option-container'));
+options.forEach(option => {
+  const OptionCollection = new CollectionTypeManager({
+    containerId: option.id,
+    addButtonId: `add-${option.id}`,
+    removeButtonsClassName: `remove-${option.id}`,
+  });
+});
+```
+
+But don't forget to subscribe to the `after.add.widget` event in order to manage `OptionCollection` 
+after adding a new parent field.
+
+```js
+const QuestionCollection = new CollectionTypeManager({
+  // prev code...
+
+  subscriber: function () {
+    const subscriber = new Subscriber();
+    
+    subscriber.subscribe('after.add.widget', function () {
+      const lastWidget = QuestionCollection.getLastWidgetAdded();
+
+      const optionContainer = lastWidget.querySelector('.option-container');
+      const OptionCollection = new CollectionTypeManager({
+        containerId: optionContainer.id,
+        addButtonId: `add-${optionContainer.id}`,
+        removeButtonsClassName: `remove-${optionContainer.id}`,
+      });
+    });
+
+    return subscriber;
+  }
+});
+```
+
+### ChildCollection classes
+
+> This feature allows you to automate the process described in the [previous chapter](#custom-child-collection). 
+> The main disadvantage is the loss of flexibility,only minimal configuration is supported.
+
+The `childCollectionList` property is used to set up an array of `ChildCollection` classes.
+
+```js
+import CollectionTypeManager, { ChildCollection } from "collection-type-manager";
+
+const QuestionCollection = new CollectionTypeManager({
+  // prev code...
+  childCollectionList: [
+    new ChildCollection('option-container')
+  ],
+});
+```
+`ChildCollection` classes accept three parameters: 
+
+```js
+new ChildCollection(childCollectionClassName = '', addButtonPrefix = 'add-', removeButtonPrefix = 'remove-');
+```
+The second and the third allow you to customize the prefixes of your **add** and **delete** buttons (prefix the id of the collection container)
+
+## The Sortable Implementation
 *Partially tested implementation: only the simple list and handle features are tested for now.*
 
-The collection type manager component implement the library Sortable:
+The collection type manager component implement the Sortable library:
 
 Some examples of UX possibilities: https://sortablejs.github.io/Sortable
 
@@ -134,9 +269,8 @@ const QuestionCollection = new CollectionTypeManager({
   }
 });
 ```
-When using Sortable, the names of your form fields are automatically updated to respect the order you have chosen. So you don't have to worry about your request to process your form data.
-
-*Feel free to suggest a PR, advices or simply add a star to the [GitHub repository](https://github.com/thetechnicalchallenge/collection-type-manager) if this library seems relevant to you.* 
+> When using Sortable, the names of your form fields are automatically updated to respect the order you have chosen. So you don't have to worry about your 
+> request to process your form data.
 
 Cheers.
 
