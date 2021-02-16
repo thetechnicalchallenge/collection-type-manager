@@ -2,6 +2,7 @@
 Javascript library to easily interact with [Symfony CollectionType Field](https://symfony.com/doc/current/reference/forms/types/collection.html) 
 
 * [Installation](#installation)
+* [Usage](#usage)
 * [Basic configuration](#basic-configuration)
 * [Event system](#event-system)
 * [Child collection](#child-collections)
@@ -34,8 +35,12 @@ $builder
 ```
 ### Twig Form Theme
 The easiest way to create your design is to create a [form theme](https://symfony.com/doc/current/form/form_themes.html). 
-If you are not yet familiar with the form themes, I propose you to read the doc and to implement a theme in [the same template as your form](https://symfony.com/doc/current/form/form_themes.html#creating-a-form-theme-in-the-same-template-as-the-form)
-as a first step. [Fragment Naming for Collections](https://symfony.com/doc/current/form/form_themes.html#fragment-naming-for-collections) is the essential chapter to understand the twig code below, a very basic example that you can customize:
+If you are not familiar with the form themes, I propose you to read the doc and to implement a theme in [the same template as your form](https://symfony.com/doc/current/form/form_themes.html#creating-a-form-theme-in-the-same-template-as-the-form)
+as a first step. [Fragment Naming for Collections](https://symfony.com/doc/current/form/form_themes.html#fragment-naming-for-collections) is the essential chapter to understand the twig code we will use throughout this documentation.
+
+Following the logic of our example, here is a basic customizable example for a collection of questions:
+
+*`id` and `data attributes` are necessary for the internal functioning of the library.*
 ```twig
 {% block _quiz_questions_widget %}  
   <ul id="question-list" 
@@ -52,11 +57,11 @@ as a first step. [Fragment Naming for Collections](https://symfony.com/doc/curre
 {% endblock %}  
   
 {% block _quiz_questions_entry_widget %}  
-  <li id="{{id}}">  
-    {{form_row(form.question)}} 
-    {{form_row(form.answer)}} 
+  <li id="{{ id }}">  
+    {{ form_row(form.question) }} 
+    {{ form_row(form.answer) }} 
     <button type="button" 
-      data-target="{{id}}" 
+      data-target="{{ id }}" 
       class="remove-question"> Remove </button>  
   </li>
 {% endblock %}
@@ -102,7 +107,8 @@ const QuestionCollection = new CollectionTypeManager({
       
       // In 'after.add.widget' event, you can access the last added widget.
       const lastWidget = QuestionCollection.getLastWidgetAdded();
-      
+
+      // Your logic...
     });
     
     subscriber.subscribe(['after.add.widget', 'after.remove.widget'], function () {
@@ -113,13 +119,13 @@ const QuestionCollection = new CollectionTypeManager({
   }
 });
 ```
-You can directly pass the name of the event you want to connect to but you can also pass an array of events 
+You can directly pass the name of the event you want to connect with, but you also can pass an array of events 
 to execute the same action at several points in the workflow.
 
 Events available: `mount`, `before.add.widget`, `after.add.widget`, `before.remove.widget`, `after.remove.widget`.
 
-> Be careful, `mount` is triggered at the end of the `constructor` method which means that the collection system is created but the instance
-> is not yet usable.
+> Be careful, `mount` is triggered at the end of the `constructor` method of `CollectionTypeManager` which means that the 
+> collection system is created but the instance is not yet usable.
 
 ## Child collections
 
@@ -142,21 +148,21 @@ $builder
 ;
 ```
 
-### Form Theme for options collection
+### Form Theme for option collection
 After added `{{ form_row(form.options) }}` to the twig block `_quiz_questions_entry_widget`, we can create 
 the following blocks: 
 
-*Read again the chapter about [fragment naming for collections](https://symfony.com/doc/current/form/form_themes.html#fragment-naming-for-collections
-) if this twig code does not seem obvious to you yet.*
+> Make sure that the **add** and **remove** buttons are specific to the current sub-collection through its `id`
+> and think about adding a common class, here `option-container`, in order to be able to recover all the containers.
 
 ```twig
 {% block _theme_questions_entry_options_widget %}
   <div id="{{ id }}"
-    class="option-container" {# We retrieve all the option containers with a class. #}
+    class="option-container" {# We retrieve all the option containers through a common class. #}
     data-prototype="{{ form_widget(form.vars.prototype)|e }}"
     data-counter="{{ form|length }}">
     {% for option in form %}
-        {{ form_widget(option) }}
+      {{ form_widget(option) }}
     {% endfor %}
   </div>
 
@@ -174,6 +180,8 @@ the following blocks:
   </div>
 {% endblock %}
 ```
+> Read again the chapter about [Fragment Naming for Collections](https://symfony.com/doc/current/form/form_themes.html#fragment-naming-for-collections
+) if this twig code does not seem obvious to you yet.
 
 ### Custom child collections
 First, I will show you an example of a custom configuration to help you better understand how 
@@ -220,8 +228,8 @@ const QuestionCollection = new CollectionTypeManager({
 
 ### ChildCollection classes
 
-> This feature allows you to automate the process described in the [previous chapter](#custom-child-collection). 
-> The main disadvantage is the loss of flexibility,only minimal configuration is supported.
+> This feature allows you to automate the process described in the [previous chapter](#custom-child-collections). 
+> The main disadvantage is the loss of flexibility, only minimal configuration is supported.
 
 The `childCollectionList` property is used to set up an array of `ChildCollection` classes.
 
@@ -235,12 +243,15 @@ const QuestionCollection = new CollectionTypeManager({
   ],
 });
 ```
-`ChildCollection` classes accept three parameters: 
+
+`ChildCollection` constructor accept three parameters in reference to the chapter (Form Theme for option collection) [form-theme-for-option-collection]: 
 
 ```js
 new ChildCollection(childCollectionClassName = '', addButtonPrefix = 'add-', removeButtonPrefix = 'remove-');
 ```
-The second and the third allow you to customize the prefixes of your **add** and **delete** buttons (prefix the id of the collection container)
+
+The first is the common class of all the containers of the collection child, second and third allow you to customize the prefixes 
+of your **add** and **delete** buttons (prefix with the `id` of the child collection container)
 
 ## The Sortable Implementation
 *Partially tested implementation: only the simple list and handle features are tested for now.*
@@ -263,7 +274,7 @@ const QuestionCollection = new CollectionTypeManager({
   enableSortable: true,
   sortableConfig: {  
     onEnd: function (/**Event*/evt) {  
-        // Your logic
+      // Your logic
     },
     animation: 300
   }
