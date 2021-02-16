@@ -244,7 +244,7 @@ const QuestionCollection = new CollectionTypeManager({
 });
 ```
 
-`ChildCollection` constructor accept three parameters in reference to the chapter (Form Theme for option collection) [form-theme-for-option-collection]: 
+`ChildCollection` constructor accept three parameters in reference to the chapter (Form Theme for option collection)[form-theme-for-option-collection]: 
 
 ```js
 new ChildCollection(childCollectionClassName = '', addButtonPrefix = 'add-', removeButtonPrefix = 'remove-');
