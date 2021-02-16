@@ -156,7 +156,7 @@ the following blocks:
 > and think about adding a common class, here `option-container`, in order to be able to recover all the containers.
 
 ```twig
-{% block _theme_questions_entry_options_widget %}
+{% block _quiz_questions_entry_options_widget %}
   <div id="{{ id }}"
     class="option-container" {# We retrieve all the option containers through a common class. #}
     data-prototype="{{ form_widget(form.vars.prototype)|e }}"
@@ -169,7 +169,7 @@ the following blocks:
   <button type="button" id="add-{{ id }}">Add an option</button>
 {% endblock %}
 
-{% block _theme_questions_entry_options_entry_widget %}
+{% block _quiz_questions_entry_options_entry_widget %}
   <div id="{{ id }}">
     {{ form_widget(form) }}
     <button type="button"
