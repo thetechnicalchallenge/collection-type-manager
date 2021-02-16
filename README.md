@@ -152,7 +152,7 @@ $builder
 After added `{{ form_row(form.options) }}` to the twig block `_quiz_questions_entry_widget`, we can create 
 the following blocks: 
 
-> Make sure that the **add** and **remove** buttons are specific to the current sub-collection through its `id`
+> Make sure that the **add** and **remove** buttons are specific to the current child collection through its `id`
 > and think about adding a common class, here `option-container`, in order to be able to recover all the containers.
 
 ```twig
