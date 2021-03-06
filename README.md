@@ -286,3 +286,5 @@ const QuestionCollection = new CollectionTypeManager({
 Cheers.
 
 Contact: thetechnicalchallenge@gmail.com
+
+[MIT license](https://github.com/thetechnicalchallenge/collection-type-manager/blob/master/License)
